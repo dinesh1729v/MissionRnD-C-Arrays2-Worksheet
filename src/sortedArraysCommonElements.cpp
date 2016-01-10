@@ -15,22 +15,22 @@ NOTES:
 */
 
 #include <iostream>
-
+#include <stdlib.h>
 struct transaction {
 	int amount;
 	char date[11];
 	char description[20];
 };
-int length(char *s)
+int length2(char *s)
 {
 	int i = 0;
 	for (i = 0; s[i] != '\0'; i++);
 	return i;
 }
-int isValid(char *s)
+int isValid2(char *s)
 {
 	int d, i, m, y, month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }, leap = 0;
-	if (length(s) != 10)return 0;
+	if (length2(s) != 10)return 0;
 	for (i = 0; i<10; i++)
 	{
 		if (i == 2 || i == 5)continue;
@@ -80,7 +80,8 @@ struct transaction * sortedArraysCommonElements(struct transaction *A, int ALen,
 	struct transaction *common = (struct transaction*)malloc(sizeof(struct transaction)*100);
 	while (len--)
 	{
-		if (ALen == i+1 || BLen == j+1)break;
+		if (ALen == i || BLen == j)break;
+		if (!isValid2(A[i].date) || !isValid2(B[j].date))return NULL;
 		int compare = isOlder(A[i].date, B[j].date);
 		if (compare == 2)
 			i++;
@@ -89,8 +90,11 @@ struct transaction * sortedArraysCommonElements(struct transaction *A, int ALen,
 		else
 		{
 			c++;
+			//common = (struct transaction*)realloc(common, c);
 			common[c - 1] = A[i];
+			i++; j++;
 		}
 	}
+	if (c == 0)return NULL;
 	return common;
 }
