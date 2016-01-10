@@ -51,8 +51,78 @@ int isValid3(char *s)
 	if (month[m - 1] < d)return 0;
 	return 1;
 }
+int isOlder1(char *date1, char *date2) {
+	int d1, d2, m1, m2, y1, y2;
+	d1 = (date1[0] - 48) * 10 + (date1[1] - 48);
+	m1 = (date1[3] - 48) * 10 + (date1[4] - 48);
+	y1 = ((date1[6] - 48) * 1000) + ((date1[7] - 48) * 100) + ((date1[8] - 48) * 10) + ((date1[9] - 48));
+	d2 = (date2[0] - 48) * 10 + (date2[1] - 48);
+	m2 = (date2[3] - 48) * 10 + (date2[4] - 48);
+	y2 = ((date2[6] - 48) * 1000) + ((date2[7] - 48) * 100) + ((date2[8] - 48) * 10) + ((date2[9] - 48));
+	if (y1 < y2)return 1;
+	else if (y1>y2)return 2;
+	else if (y1 == y2)
+	{
+		if (m1 < m2)return 1;
+		else if (m1>m2)return 2;
+		else if (m1 == m2)
+		{
+			if (d1 < d2)return 1;
+			else if (d1>d2)return 2;
+			else if (d1 == d2)return 0;
+		}
+	}
+}
 
 struct transaction * mergeSortedArrays(struct transaction *A, int ALen, struct transaction *B, int BLen) {
 	if (A == NULL || B == NULL || ALen < 0 || BLen < 0)return NULL;
-
+	int len = 0, i = 0, j = 0, c = 0;
+	struct transaction *merge = (struct transaction *)malloc(sizeof(struct transaction)*(ALen + BLen));
+	while (c!=(ALen+BLen))
+	{
+		if (i == ALen)
+		{
+			while (j != BLen)
+			{
+				if (!isValid3(B[j].date))return NULL;
+				merge[c] = B[j];
+				c++;
+				j++;
+			}
+			break;
+		}
+		if (j == BLen)
+		{
+			while (i != ALen)
+			{
+				if (!isValid3(A[i].date))return NULL;
+				merge[c] = A[i];
+				c++; i++;
+			}
+			break;
+		}
+		int compare = isOlder1(A[i].date, B[j].date);
+		if (compare == 1)
+		{
+			if (!isValid3(A[i].date))return NULL;
+			merge[c] = A[i];
+			i++;
+		}
+		else if (compare == 2)
+		{
+			if (!isValid3(B[j].date))return NULL;
+			merge[c] = B[j];
+			j++;
+		}
+		else
+		{
+			if (!isValid3(B[j].date) || !isValid3(A[i].date))return NULL;
+			merge[c] = A[i];
+			c++;
+			merge[c] = B[j];
+			i++, j++;
+		}
+		c++;
+	}
+	return merge;
 }
